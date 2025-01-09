@@ -3,7 +3,9 @@
 
 
 // Global Variables
-//TODO
+constexpr float ERROR_OFFSET = 22.0f; // Degrees
+constexpr int16_t MIN_POS = 0;
+constexpr int16_t RANGE = 1023 - MIN_POS;
 
 //Resets the controller state when an experiment is started.
 void reset(){
@@ -16,20 +18,16 @@ void reset(){
  * @param position The original position value to be rescaled.
  * @return The rescaled position value, adjusted to remain within a range of 0 to 360.
  */
-float rescalepos(int16_t position){  //rescaling function
+float rescalepos(int16_t position) { // Rescaling function
   float rescaled;
   float degrees;
-  
-  float error_offset = 22; //degrees
-  int16_t min_pos = 0;
-  int16_t range = 1023 - min_pos;
 
-  // observed min: 6 - max: 1014
-  rescaled = (position - min_pos) * (2 * PI) / range;
-  degrees = fmod(((rescaled * 180) / PI - error_offset), 360.0);
+  // Observed min: 6 - max: 1014
+  rescaled = (position - MIN_POS) * (2 * PI) / RANGE; // Use M_PI for pi
+  degrees = fmod(((rescaled * 180.0f) / PI - ERROR_OFFSET), 360.0f);
 
   if (degrees < 0) {
-    degrees = degrees + 360;
+      degrees += 360.0f;
   }
 
   return degrees;
