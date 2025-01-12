@@ -33,6 +33,12 @@ receive_data_size = calcsize(receive_data_format)
 
 send_data_format = "<hcb"
 
+def calculate_mse(position, target = 400):
+    mse = 0
+    for pos in position:
+        mse += (pos - target)**2
+
+    return mse / len(position)
 
 def run_experiment(**kwargs):
     # set up the serial line
@@ -95,7 +101,12 @@ def run_experiment(**kwargs):
     df.drop('Version', axis=1, inplace=True)
     df["Position Derivative"] = df['Position'].diff()
     average_pos_diff = sum([der for der in df['Position Derivative'] if np.abs(der) < 100]) / len([der for der in df['Position Derivative'] if np.abs(der) < 100])
+    disturbance_diff = df['Disturbance'].diff()
+    average_disturbance_diff = sum([np.abs(der) for der in disturbance_diff if np.abs(der) < 100]) / len([der for der in disturbance_diff if np.abs(der) < 100])
+
     print(f"Average Deriv::{average_pos_diff} for torque ::{kwargs['torque']}")
+    print(f"Average Deriv of disturbance::{average_disturbance_diff} for torque ::{kwargs['torque']}")
+    print(f"MSE compared to 400:: {calculate_mse(df['Position'].to_list())}")
 
     df.index.name = "Experiment-Time in seconds"
     fig = df.plot(kind='line', line_shape='hv')
