@@ -5,6 +5,7 @@
 // Global Constants
 constexpr float ERROR_OFFSET = 22.0f; // Degrees
 constexpr float DELTA_T = 0.011f;
+constexpr float OFFSET_TORQUE = 5.0f;
 constexpr int16_t MIN_POS = 0;
 constexpr int16_t RANGE = 1023 - MIN_POS;
 
@@ -78,7 +79,6 @@ int16_t error_integral(int16_t error) {
   return accumulated_error;
 }
 
-float offset_torque = 5.0f;
 /**
  * Implements a basic controller using proportional, integral, and derivative (PID) control.
  *
@@ -100,8 +100,8 @@ int16_t controller(int16_t error, int16_t error_i, int16_t error_d, int16_t meas
 
   float control_torque = Kp * (error + (1.0f / Ti) * error_i + Td * error_d);
 
-  return int16_t(control_torque + offset_torque - measured_disturbance);
-  // return int16_t(control_torque + offset_torque);
+  return int16_t(control_torque + OFFSET_TORQUE - measured_disturbance);
+  // return int16_t(control_torque + OFFSET_TORQUE);
 }
 
 /**
